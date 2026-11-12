@@ -9,7 +9,7 @@
       "build": "CodeZip",
       "entrypoint": "main.py",
       "codeLocation": "app/agent",
-      "runtimeVersion": "PYTHON_3_14",
+      "runtimeVersion": "PYTHON_3_12",
       "protocol": "HTTP"
     }
   ],
