@@ -26,16 +26,30 @@ The goal is to build an intelligent study assistant capable of explaining AWS co
 - [ ] Implement the study materials search tool
 - [ ] Implement the practice question tool
 - [ ] Add automated tests
-- [ ] Deploy to AgentCore Runtime
+- [x] Deploy to AgentCore Runtime in eu-central-1
+- [x] Verify cloud agent invocation and Python tool execution
+- [x] Inspect runtime logs in Amazon CloudWatch
 - [ ] Document deployment, security, costs, and cleanup
 
 ## Current Architecture
 
-Local HTTP client → AgentCore development server → Strands Agent → Amazon Bedrock
+### Local Development
 
-The agent can invoke Python tools as part of its workflow.
+Local HTTP Client → AgentCore Dev Server → Strands Agent → Amazon Bedrock
 
-Cloud deployment is planned but has not yet been completed.
+### AWS Cloud Deployment
+
+```text
+AgentCore Runtime (eu-central-1)
+          |
+      Strands Agent
+       /       \
+Amazon Bedrock  Python Tools
+ (Nova Micro)    (add_numbers)
+```
+
+Observability: Amazon CloudWatch Logs  
+Infrastructure: AWS CDK / CloudFormation
 
 ## Security
 
@@ -43,9 +57,24 @@ Cloud deployment is planned but has not yet been completed.
 - Local configuration and deployment state are excluded from Git.
 - AWS permissions and deployment configuration will be reviewed before provisioning resources.
 - The project uses original practice questions and non-confidential study materials.
+- Developer access uses AWS IAM Identity Center with MFA and temporary SSO credentials.
+- The deployed agent uses a dedicated IAM execution role.
 
 ## Project Status
 
 **In active development.**
 
-The current milestone is a working local Strands agent with Amazon Bedrock inference and tool calling.
+The first cloud prototype is deployed to Amazon Bedrock AgentCore Runtime
+in eu-central-1.
+
+Amazon Bedrock inference and the demonstration add_numbers tool have
+been verified through a successful cloud invocation.
+
+Certification study tools and automated tests are planned for the
+next development milestone.
+
+## Known Issues
+
+- OpenTelemetry span export returned HTTP 400 during testing.
+  Agent invocation and tool execution were successful.
+  Further observability investigation is pending.
