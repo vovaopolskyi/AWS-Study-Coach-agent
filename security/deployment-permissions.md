@@ -108,3 +108,43 @@ Replace broad AdministratorAccess with scoped deployment permissions.
 - Restrict S3 access to required deployment resources.
 - Validate any boundary before attaching it to the runtime role.
 - Preserve a recovery path if deployment or invocation fails.
+
+## Deployment Security Architecture
+
+### Runtime Execution Role
+- CDK currently generates the IAM role name.
+- The deployed role does not have a permissions boundary.
+- Apply a dedicated customer-managed permissions boundary.
+- Verify that CloudFormation can update the role without replacement.
+
+### CloudFormation Execution Role
+- Replace AdministratorAccess with a custom deployment policy.
+- Restrict iam:PassRole to the approved Runtime Execution Role.
+- Require the approved boundary when creating managed IAM roles.
+- Restrict IAM role and policy lifecycle permissions.
+- Protect against removing or replacing the boundary.
+
+### Migration Strategy
+1. Prepare and validate the Runtime permissions boundary.
+2. Apply the boundary through CDK while retaining admin recovery access.
+3. Verify deployment, rollback capability, and cloud invocation.
+4. Restrict the CDK bootstrap CloudFormation Execution Role.
+5. Validate deployment using the restricted SSO role.
+6. Retire broad administrative deployment access only after successful validation.
+
+## CodeZip Reproducibility
+
+### Findings
+- CDK synth produces a stable artifact hash across repeated runs.
+- The current artifact differs from the deployed artifact.
+- The deployed ZIP contains strands-agents 1.64.0.
+- The current ZIP contains strands-agents 1.65.0.
+- Python dependencies have changed without Git changes to uv.lock.
+- The CDK asset manifest references an already-created ZIP file.
+- The precise AgentCore CLI dependency resolution mechanism
+  has not yet been confirmed.
+
+### Deployment Guardrail
+- Do not deploy the current CDK changes while CodeZip drift is unexplained.
+- Validate dependency versions against the lockfile.
+- Keep IAM security changes separate from Python dependency updates.

@@ -1,7 +1,7 @@
 import { AgentCoreApplication, type AgentCoreApplicationProps } from '@aws/agentcore-cdk';
 import { Stack, Tags, type StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-
+import * as iam from 'aws-cdk-lib/aws-iam';
 export interface AgentCoreStackProps extends StackProps {
   /** Props for the AgentCore application, produced by transformAgentCoreJson from agentcore/agentcore.json. */
   application: AgentCoreApplicationProps;
@@ -18,6 +18,13 @@ export class AgentCoreStack extends Stack {
   constructor(scope: Construct, id: string, props: AgentCoreStackProps) {
     super(scope, id, props);
     this.application = new AgentCoreApplication(this, 'Application', props.application);
+    const runtimeBoundary = iam.ManagedPolicy.fromManagedPolicyName(
+      this,
+      'RuntimePermissionsBoundary',
+      'AWSStudyCoachRuntimeBoundary'
+    );
+
+    iam.PermissionsBoundary.of(this.application).apply(runtimeBoundary);
 
     // Example: give a runtime a DynamoDB table.
     //
