@@ -1,5 +1,5 @@
 import { AgentCoreApplication, type AgentCoreApplicationProps } from '@aws/agentcore-cdk';
-import { Stack, type StackProps } from 'aws-cdk-lib';
+import { Stack, Tags, type StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 export interface AgentCoreStackProps extends StackProps {
@@ -28,5 +28,8 @@ export class AgentCoreStack extends Stack {
     // const checkout = this.application.runtime('checkout'); // or .harness('support')
     // checkout.grantReadWrite(orders);
     // checkout.addEnvironmentVariable('ORDERS_TABLE', orders.tableName);
+    Tags.of(this).add('Project', 'AWSStudyCoach');
+    Tags.of(this).add('Environment', 'dev');
+    Tags.of(this).add('ManagedBy', 'CDK');
   }
 }
