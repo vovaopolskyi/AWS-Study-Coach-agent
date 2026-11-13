@@ -1,0 +1,96 @@
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ManageExistingStudyCoachRuntime",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock-agentcore:GetAgentRuntime",
+        "bedrock-agentcore:UpdateAgentRuntime",
+        "bedrock-agentcore:DeleteAgentRuntime",
+        "bedrock-agentcore:TagResource",
+        "bedrock-agentcore:UntagResource"
+      ],
+      "Resource": "RUNTIME_ARN_HERE"
+    },
+    {
+      "Sid": "CreateTaggedStudyCoachRuntime",
+      "Effect": "Allow",
+      "Action": "bedrock-agentcore:CreateAgentRuntime",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestTag/Project": "AWSStudyCoach"
+        }
+      }
+    },
+    {
+      "Sid": "PassExistingRuntimeExecutionRole",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "AGENT_EXECUTION_ROLE_ARN_HERE",
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": "bedrock-agentcore.amazonaws.com"
+        }
+      }
+    },
+    {
+      "Sid": "CreateRuntimeRoleWithApprovedBoundary",
+      "Effect": "Allow",
+      "Action": "iam:CreateRole",
+      "Resource": "arn:aws:iam::ACCOUNT_ID:role/AgentCore-AWSStudyCoach-*",
+      "Condition": {
+        "StringEquals": {
+          "iam:PermissionsBoundary": "arn:aws:iam::ACCOUNT_ID:policy/AWSStudyCoachRuntimeBoundary"
+        }
+      }
+    },
+    {
+      "Sid": "ReadProjectRuntimeRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetRole",
+        "iam:GetRolePolicy",
+        "iam:ListRolePolicies",
+        "iam:ListRoleTags",
+        "iam:ListAttachedRolePolicies"
+      ],
+      "Resource": "arn:aws:iam::ACCOUNT_ID:role/AgentCore-AWSStudyCoach-*"
+    },
+    {
+      "Sid": "ManageProjectRuntimeRoleLifecycle",
+      "Effect": "Allow",
+      "Action": [
+        "iam:DeleteRole",
+        "iam:UpdateAssumeRolePolicy",
+        "iam:TagRole",
+        "iam:UntagRole",
+        "iam:PutRolePolicy",
+        "iam:DeleteRolePolicy"
+      ],
+      "Resource": "arn:aws:iam::ACCOUNT_ID:role/AgentCore-AWSStudyCoach-*"
+    },
+    {
+      "Sid": "ApplyApprovedPermissionsBoundary",
+      "Effect": "Allow",
+      "Action": "iam:PutRolePermissionsBoundary",
+      "Resource": "arn:aws:iam::ACCOUNT_ID:role/AgentCore-AWSStudyCoach-*",
+      "Condition": {
+        "StringEquals": {
+          "iam:PermissionsBoundary": "arn:aws:iam::ACCOUNT_ID:policy/AWSStudyCoachRuntimeBoundary"
+        }
+      }
+    },
+    {
+      "Sid": "ReadDeploymentArtifacts",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:GetObjectVersion"
+      ],
+      "Resource": "arn:aws:s3:::CDK_ASSET_BUCKET_HERE/*"
+    }
+  ]
+}
